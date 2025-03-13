@@ -27,7 +27,7 @@ pipeline {
         stage('Initialize Build') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                    setBuildStatus("Build is starting...'", "PENDING");
+                    setBuildStatus("Build is starting...", "PENDING");
                 }
             }
         }
@@ -51,12 +51,12 @@ pipeline {
     post {
         success {
                 withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                    setBuildStatus("Build succeeded'", "SUCCESS");
+                    setBuildStatus("Build succeeded", "SUCCESS");
                 }
         }
         failure {
             withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                setBuildStatus("Build failed'", "FAILURE");
+                setBuildStatus("Build failed", "FAILURE");
             }
         }
         always {
