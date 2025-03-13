@@ -1,7 +1,10 @@
 void setBuildStatus(String message, String state) {
+    def repoUrl = scm.getUserRemoteConfigs()[0].getUrl()
+    
+    echo "DEBUG: Repository URL detected: ${repoUrl}"
   step([
       $class: "GitHubCommitStatusSetter",
-      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://www.github.com/cyse7125-sp25-team03/db-trace-processor"],
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
       contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
       errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
       statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
@@ -19,7 +22,7 @@ pipeline {
         stage('Initialize Build') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                    setBuildStatus("Build is starting...'", "PENDING");
+                    setBuildStatus("Build is starting...", "PENDING");
                 }
             }
         }
@@ -33,6 +36,7 @@ pipeline {
             steps {
                 script {
                     echo "This is a PR validation for PR#${env.CHANGE_ID}"
+
                     sh 'docker build --no-cache -t test-build .'
                     
                 }
@@ -43,12 +47,12 @@ pipeline {
     post {
         success {
                 withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                    setBuildStatus("Build succeeded'", "SUCCESS");
+                    setBuildStatus("Build succeeded", "SUCCESS");
                 }
         }
         failure {
             withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                setBuildStatus("Build failed'", "FAILURE");
+                setBuildStatus("Build failed", "FAILURE");
             }
         }
         always {
