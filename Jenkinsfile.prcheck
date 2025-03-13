@@ -1,20 +1,12 @@
 void setBuildStatus(String message, String state) {
-    def repo = env.GIT_URL.replaceAll(/\.git$/, "").replaceAll(/^.*github.com[:\/]/, "")
-    def commitSHA = env.GIT_COMMIT // Jenkins automatically provides this
-
-    sh """
-    curl -X POST -H "Authorization: token ${env.GITHUB_TOKEN}" \
-         -H "Accept: application/vnd.github.v3+json" \
-         https://api.github.com/repos/${repo}/statuses/${commitSHA} \
-         -d '{
-           "state": "${state}",
-           "target_url": "${env.BUILD_URL}",
-           "description": "${message}",
-           "context": "ci/jenkins/${JOB_NAME}"
-         }'
-    """
+  step([
+      $class: "GitHubCommitStatusSetter",
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://www.github.com/cyse7125-sp25-team03/db-trace-processor"],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+  ]);
 }
-
 
 pipeline {
     agent any
@@ -41,6 +33,7 @@ pipeline {
             steps {
                 script {
                     echo "This is a PR validation for PR#${env.CHANGE_ID}"
+
                     sh 'docker build --no-cache -t test-build .'
                     
                 }
