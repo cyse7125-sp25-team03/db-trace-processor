@@ -137,7 +137,7 @@ The repository includes Jenkins pipeline configurations for automating migration
 | `DB_NAME`    | PostgreSQL database name                   | Yes      |
 | `DB_USER`    | PostgreSQL username with migration rights  | Yes      |
 | `DB_PASSWORD`| PostgreSQL user password                   | Yes      |
-| `DB_SCHEMA`  | PostgreSQL schema (default: public)        | No       |
+| `DB_SCHEMA`  | PostgreSQL schema                          | Yes       |
 | `FLYWAY_PLACEHOLDERS_APP_USER` | Application user placeholder | No    |
 | `FLYWAY_CONNECT_RETRIES`   | Connection retry attempts     | No       |
 
